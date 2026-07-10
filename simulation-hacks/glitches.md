@@ -87,3 +87,12 @@ Source: "A Return to Code" — Naval.
 Consensus: saving highlights is knowledge management.
 Actually: a highlight archive is inventory, not insight — the extraction step (naming the mispricing and dating it) is nearly free and almost nobody does it. This file is the play.
 Source: your own Notion, examined.
+
+---
+
+## Running log
+
+*New entries land here from voice captures (see [../voice-capture/README.md](../voice-capture/README.md) — or just run `/capture` and paste a transcript). Newest first.*
+
+<!-- CAPTURE-INSERT -->
+
