@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "nates-library": {
+      "type": "http",
+      "url": "https://www.contentmasterpro.limited/api/nates-library"
+    }
+  }
+}
