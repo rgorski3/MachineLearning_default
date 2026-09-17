@@ -4,6 +4,9 @@ Brainstorm / idea dump. Nothing here is investment advice, and nothing here is a
 finished thesis — it's the shape of the problem plus the places where the interesting
 work is.
 
+Companion: [`etf-robot-ownership-vehicle-design.md`](./etf-robot-ownership-vehicle-design.md)
+— the SPV / REIT / trust wrapper design, which is the binding constraint on everything below.
+
 ---
 
 ## 1. First, disambiguate what "own a robot" means
