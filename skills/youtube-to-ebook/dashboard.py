@@ -429,7 +429,8 @@ def get_channels():
         return []
 
     channels_block = match.group(1)
-    handles = re.findall(r'["\'](@[\w]+)["\']', channels_block)
+    # YouTube handles can contain letters, digits, '_', '-' and '.'
+    handles = re.findall(r'["\'](@[\w.-]+)["\']', channels_block)
     return handles
 
 
@@ -462,7 +463,7 @@ def extract_handle_from_url(url_or_handle):
         return text
 
     patterns = [
-        r'youtube\.com/@([\w]+)',
+        r'youtube\.com/@([\w.-]+)',
         r'youtube\.com/c/([\w]+)',
         r'youtube\.com/channel/([\w-]+)',
         r'youtube\.com/user/([\w]+)',
