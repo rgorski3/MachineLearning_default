@@ -98,6 +98,7 @@ if __name__ == "__main__":
         "title": "Test Video",
         "channel": "Test Channel",
         "url": "https://youtube.com/watch?v=test",
+        "description": "A test video about a new project.",
         "transcript": "Hello everyone, today we're going to talk about something really exciting. I've been working on this project for months and I can't wait to share it with you. The main idea is simple but powerful..."
     }
 
