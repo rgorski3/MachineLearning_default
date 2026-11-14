@@ -68,16 +68,19 @@ All four came out 2.6–3.4× longer than the original (1,370–1,820 words agai
 ## Findings worth your attention
 
 **youtube-to-ebook, where the original SKILL.md disagreed with the code.** The full list of 18 is in CHANGES.md.
-- Transcripts come from **Supadata** (`SUPADATA_API_KEY`), not youtube-transcript-api. The key is **missing from `.env.example`**.
+- Transcripts come from **Supadata** (`SUPADATA_API_KEY`), not youtube-transcript-api. The key was **missing from `.env.example`** (fixed 2026-11-14, see below).
 - Channels come from the `CHANNELS` list in `get_videos.py`. There is no `--channels` flag and no `channels.txt`.
 - Email is not optional in practice. If the Gmail send fails, nothing is marked processed, so the next run pays Claude and Supadata again for the same videos.
 - `run_newsletter.sh`, both plists and `launch_dashboard.command` hard-code `/Users/bytedance/youtube-newsletter`.
 - `write_articles.py` still calls **`claude-sonnet-4-20250514`**. That is a pre-5.x model and the best follow-up candidate.
 
-**youtube-to-ebook, bugs in the scripts.** I checked all three myself. None are fixed yet.
-- The `write_articles.py` self-test raises `KeyError: 'description'`, because the test dict has no description key.
-- The dashboard's "Clear All History" button only shows a warning and deletes nothing.
-- The dashboard's handle regex `@[\w]+` silently drops channel handles that contain `.` or `-`.
+**youtube-to-ebook, bugs in the scripts. All fixed on 2026-11-14.** The fixes are on this branch at `skills/youtube-to-ebook/`, with one commit per fix after merging the skill branch in:
+- The `write_articles.py` self-test raised `KeyError: 'description'`, because the test dict had no description key. The dict now includes one.
+- The dashboard's "Clear All History" button only showed a warning and deleted nothing. It now asks for confirmation, then empties `processed_videos.json`. Cancel leaves the history alone.
+- The dashboard's handle regex `@[\w]+` dropped handles that contain `.` or `-`. This was worse than it looked: the next add or remove on the Channels page rewrote `get_videos.py` without them, which deleted those channels. Pasting `youtube.com/@some.name` also added `@some`. Both patterns now allow `.` and `-`.
+- `SUPADATA_API_KEY` is now in `.env.example`, with the placeholder value the script treats as unset.
+
+A test script reproduced all four problems on the original code, failing 5 of 5 checks, and passes 5 of 5 on the fixed code. It drives the real dashboard with Streamlit's app tester, including the Cancel path, and stubs the Claude client so it makes no API call. The four skill versions and `CHANGES.md` were updated to match. Still open: `streamlit` is missing from `requirements.txt`, the plists and scripts hard-code `/Users/bytedance`, and a `youtube.com/channel/UC...` URL turns into `@UC...`, which the API can't find.
 
 **`/capture`, what changed.**
 - It now defines when a run is done.
@@ -94,7 +97,7 @@ All four came out 2.6–3.4× longer than the original (1,370–1,820 words agai
 
 1. Pick a skill version for the model you actually run (probably Opus or Sonnet). Copy it over `skills/youtube-to-ebook/SKILL.md` on `claude/youtube-to-ebook-skill-w2cerv` and keep the `.bak`.
 2. Copy the new `capture.md` onto `claude/simulation-life-hacks-soslrp`.
-3. Add `SUPADATA_API_KEY` to `.env.example` and fix the 3 script bugs. These are small, and I can do them on request.
+3. ~~Add `SUPADATA_API_KEY` to `.env.example` and fix the 3 script bugs.~~ Done 2026-11-14. To apply the fixes to the skill branch: `git checkout claude/youtube-to-ebook-skill-w2cerv && git cherry-pick 3ba42bc c11b4b3 6af1bef 9c3ca9e`.
 4. Optional: update the prompt and model in `write_articles.py` to 5.x, and run a model-specific pass over the vendored skills you actually use.
 
 ## Run log

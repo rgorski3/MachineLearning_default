@@ -54,7 +54,7 @@ This means a failed email leaves nothing archived or marked. The EPUB stays in t
 
 1. Create a project folder (for example `~/youtube-newsletter`) and copy every file from this skill's directory into it.
 2. Run `pip install -r requirements.txt`. For the dashboard, also run `pip install streamlit`, which is not in `requirements.txt`.
-3. Run `cp .env.example .env` and add a `SUPADATA_API_KEY=` line, which the example file lacks. The user fills in the values:
+3. Run `cp .env.example .env`. The user fills in the values:
 
 | Variable | Used by | Source |
 |----------|---------|--------|
@@ -79,7 +79,7 @@ This means a failed email leaves nothing archived or marked. The EPUB stays in t
 | `python3 video_tracker.py` | Lists the videos already processed |
 | `python3 send_email.py` | Sends a test newsletter with one mock article (a real email) |
 
-The project has no `channels.txt` and no command-line flags such as `--channels`. The self-test in `python3 write_articles.py` fails with `KeyError: 'description'` because its mock video has no description, so test article writing through `main.py` instead.
+The project has no `channels.txt` and no command-line flags such as `--channels`. The self-test in `python3 write_articles.py` sends one mock video to Claude, which is a paid API call.
 
 ## Project files
 
@@ -102,12 +102,9 @@ The scripts create `processed_videos.json`, `newsletters/` and `logs/`. A failed
 
 ## Dashboard
 
-The dashboard has five pages. **Generate** runs `python3 main.py` with a 10-minute timeout and shows the log. **Channels** rewrites the `CHANNELS` list in `get_videos.py`. **Writing Style** edits the prompt in `write_articles.py`. **Archive** offers past HTML and EPUB downloads and lists processed videos. **Schedule** edits the day and hour in `~/Library/LaunchAgents/com.youtube.newsletter.plist` and reloads it with `launchctl`.
+The dashboard has five pages. **Generate** runs `python3 main.py` with a 10-minute timeout and shows the log. **Channels** rewrites the `CHANNELS` list in `get_videos.py`. **Writing Style** edits the prompt in `write_articles.py`. **Archive** offers past HTML and EPUB downloads and lists processed videos; its **Clear All History** button asks for confirmation, then empties `processed_videos.json`, so the next run processes those videos again. **Schedule** edits the day and hour in `~/Library/LaunchAgents/com.youtube.newsletter.plist` and reloads it with `launchctl`.
 
-Three parts of the dashboard code behave in ways users don't expect:
-- The **Clear All History** button only shows a warning and deletes nothing. To process videos again, delete `processed_videos.json` or remove entries from it, with the user's approval.
-- The dashboard reads handles with the pattern `@[\w]+`. A handle that contains `.` or `-` does not appear, and it is dropped from `get_videos.py` the next time the dashboard saves the list. Edit such handles in `get_videos.py` directly.
-- A `youtube.com/channel/UC...` URL turns into `@UC...`, which the YouTube API does not find. Use the channel's `@handle` instead.
+One part of the dashboard code behaves in a way users don't expect: a `youtube.com/channel/UC...` URL turns into `@UC...`, which the YouTube API does not find. Use the channel's `@handle` instead.
 
 ## Scheduling (macOS launchd only)
 

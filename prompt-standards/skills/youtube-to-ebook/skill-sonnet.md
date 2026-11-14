@@ -31,7 +31,7 @@ If the email fails, nothing is archived or marked. The EPUB stays in the project
 | Variable | Used by | Where to get it |
 |----------|---------|-----------------|
 | `YOUTUBE_API_KEY` | `get_videos.py` | Google Cloud Console: enable YouTube Data API v3, then create an API key |
-| `SUPADATA_API_KEY` | `get_transcripts.py` | Supadata (supadata.ai). Not in `.env.example`, so add the line |
+| `SUPADATA_API_KEY` | `get_transcripts.py` | Supadata (supadata.ai) |
 | `ANTHROPIC_API_KEY` | `write_articles.py` | console.anthropic.com |
 | `GMAIL_ADDRESS` | `send_email.py` | The Gmail address that sends and receives the ebook |
 | `GMAIL_APP_PASSWORD` | `send_email.py` | An app password from myaccount.google.com/apppasswords |
@@ -44,7 +44,7 @@ When the user asks "Set up YouTube to ebook for me":
 
 1. Create a project folder (for example `~/youtube-newsletter`) and copy every file from this skill's directory into it.
 2. Run `pip install -r requirements.txt` in that folder.
-3. Run `cp .env.example .env`, add a `SUPADATA_API_KEY=` line, and have the user fill in all five values.
+3. Run `cp .env.example .env` and have the user fill in all five values.
 4. Set the channels: edit the `CHANNELS` list in `get_videos.py`. It ships with 8 example channels. Use `@handles` from the channel URL (`youtube.com/@name` → `"@name"`).
 5. Check the channels: run `python3 get_videos.py`. It prints each channel and the video it found, or "Channel not found".
 6. Generate the first ebook: run `python3 main.py`, after the user agrees (see Working Rules).
@@ -61,7 +61,7 @@ When the user asks "Set up YouTube to ebook for me":
 | `python3 video_tracker.py` | List the videos already processed |
 | `python3 send_email.py` | Send a test newsletter with one mock article. This sends a real email and adds an archive entry |
 
-There is no `--channels` flag or other command-line option. `python3 write_articles.py` (its self-test) stops with `KeyError: 'description'` because its mock video has no description. Test article writing through `main.py` instead.
+There is no `--channels` flag or other command-line option. `python3 write_articles.py` runs a self-test that sends one mock video to Claude, which is a paid API call.
 
 ## Key Files
 
@@ -92,13 +92,10 @@ youtube-newsletter/
 - **Generate**: runs `python3 main.py` (10-minute timeout) and shows the log.
 - **Channels**: add or remove channels. It rewrites the `CHANNELS` list in `get_videos.py`.
 - **Writing Style**: edit the article prompt in `write_articles.py`.
-- **Archive**: download past newsletters (HTML, EPUB) and see processed videos.
+- **Archive**: download past newsletters (HTML, EPUB) and see processed videos. **Clear All History** asks for confirmation, then empties `processed_videos.json`, so the next run processes (and pays for) those videos again.
 - **Schedule**: change the day and hour in `~/Library/LaunchAgents/com.youtube.newsletter.plist` and reload it with `launchctl`.
 
-Limits of the dashboard code:
-- **Clear All History** only shows a warning. It deletes nothing. To process videos again, delete `processed_videos.json` or remove entries from it.
-- It reads handles with the pattern `@[\w]+`. A handle with `.` or `-` is not shown, and is dropped from `get_videos.py` the next time the dashboard saves the list. Edit such handles in `get_videos.py` directly.
-- A `youtube.com/channel/UC...` URL becomes `@UC...`, which the YouTube API does not find. Use the channel's `@handle`.
+Limit of the dashboard code: a `youtube.com/channel/UC...` URL becomes `@UC...`, which the YouTube API does not find. Use the channel's `@handle`.
 
 ## Scheduling (macOS launchd)
 

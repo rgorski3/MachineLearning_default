@@ -40,7 +40,7 @@ When the user asks to set this up:
 
 1. Create a project folder (for example `~/youtube-newsletter`) and copy every file from this skill's directory into it.
 2. `pip install -r requirements.txt`. Add `pip install streamlit` if they want the dashboard; it is not in `requirements.txt`.
-3. `cp .env.example .env`, then add a `SUPADATA_API_KEY=` line, which the example file lacks. The user fills in the values:
+3. `cp .env.example .env`. The user fills in the values:
 
 | Variable | Used by | Source |
 |----------|---------|--------|
@@ -65,7 +65,7 @@ When the user asks to set this up:
 | `python3 video_tracker.py` | List processed videos |
 | `python3 send_email.py` | Send a test newsletter with one mock article (real email) |
 
-`python3 write_articles.py` (the self-test) fails with `KeyError: 'description'` because its mock video has no description. Test article writing through `main.py`.
+`python3 write_articles.py` runs a self-test that sends one mock video to Claude (one paid API call).
 
 ## Project files
 
@@ -88,12 +88,9 @@ Generated: `processed_videos.json`, `newsletters/`, `logs/`, and a `youtube_dige
 
 ## Dashboard
 
-Pages: **Generate** runs `python3 main.py` with a 10-minute timeout. **Channels** rewrites `CHANNELS` in `get_videos.py`. **Writing Style** edits the prompt in `write_articles.py`. **Archive** offers past HTML and EPUB downloads and lists processed videos. **Schedule** edits the day and hour in `~/Library/LaunchAgents/com.youtube.newsletter.plist` and reloads it with `launchctl`.
+Pages: **Generate** runs `python3 main.py` with a 10-minute timeout. **Channels** rewrites `CHANNELS` in `get_videos.py`. **Writing Style** edits the prompt in `write_articles.py`. **Archive** offers past HTML and EPUB downloads and lists processed videos; its **Clear All History** button asks for confirmation, then empties `processed_videos.json`, so the next run processes those videos again. **Schedule** edits the day and hour in `~/Library/LaunchAgents/com.youtube.newsletter.plist` and reloads it with `launchctl`.
 
-Three behaviors of the dashboard code matter when users rely on it:
-- **Clear All History** only shows a warning. To process videos again, delete `processed_videos.json` or remove entries from it.
-- It parses handles with `@[\w]+`. A handle containing `.` or `-` is hidden, and is dropped from `get_videos.py` the next time the dashboard saves the list. Edit those in `get_videos.py`.
-- A `youtube.com/channel/UC...` URL becomes `@UC...`, which the API doesn't find. Use the `@handle`.
+One behavior of the dashboard code matters when users rely on it: a `youtube.com/channel/UC...` URL becomes `@UC...`, which the API doesn't find. Use the `@handle`.
 
 ## Scheduling (macOS launchd only)
 

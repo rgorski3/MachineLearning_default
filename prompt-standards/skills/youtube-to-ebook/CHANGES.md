@@ -103,6 +103,8 @@ The reference body is the same as Haiku's, because the two guides agree on conte
 
 ## Errors and unverifiable claims in the original
 
+> **Update, 2026-11-14:** four of the problems below are now fixed in the scripts on branch `ccr-ee583616-7bgump` (`skills/youtube-to-ebook/`): `SUPADATA_API_KEY` is in `.env.example`; the `write_articles.py` self-test no longer raises `KeyError: 'description'`; **Clear All History** clears `processed_videos.json` after a confirmation; and the dashboard keeps handles that contain `.` or `-`. The four skill versions were updated to match. Still open: `streamlit` missing from `requirements.txt`, the hard-coded `/Users/bytedance` paths, and `youtube.com/channel/UC...` URLs turning into `@UC...`.
+
 | # | Original | What the code does | How it was handled |
 |---|---|---|---|
 | 1 | `python main.py --channels` edits the channel list | `main.py` takes no arguments; there is no argument parsing anywhere. | Removed. Channels are edited in `CHANNELS` in `get_videos.py` or on the dashboard's Channels page. All versions say there are no CLI flags. |
