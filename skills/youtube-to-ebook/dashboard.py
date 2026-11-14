@@ -834,8 +834,26 @@ elif page == "Archive":
 
                 st.divider()
 
-                if st.button("Clear All History", type="secondary"):
-                    st.warning("This will allow all videos to be re-processed.")
+                # Two-step: clearing means the next run re-processes (and pays for) these videos again
+                if st.session_state.get("confirm_clear_history"):
+                    st.warning(
+                        f"This forgets all {len(videos)} processed videos. The next run will "
+                        "process them again, with new Claude and Supadata calls and a new email."
+                    )
+                    col_yes, col_no = st.columns(2)
+                    with col_yes:
+                        if st.button("Yes, clear history", key="confirm_clear", type="primary"):
+                            with open(TRACKER_FILE, "w") as f:
+                                json.dump({"videos": {}}, f, indent=2)
+                            st.session_state.confirm_clear_history = False
+                            st.rerun()
+                    with col_no:
+                        if st.button("Cancel", key="cancel_clear"):
+                            st.session_state.confirm_clear_history = False
+                            st.rerun()
+                elif st.button("Clear All History", type="secondary"):
+                    st.session_state.confirm_clear_history = True
+                    st.rerun()
             else:
                 st.info("No videos processed yet.")
         else:
